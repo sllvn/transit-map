@@ -3,3 +3,7 @@
   width: 800px;
   height: 800px;
 }
+
+.vehicle-popup small {
+  color: #999;
+}

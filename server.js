@@ -11,12 +11,12 @@ const router = Router()
 
 app.use(morgan.middleware('dev'))
 
-router.get('/api/routes/40', function *(next) {
-  this.body = JSON.parse(fs.readFileSync('./data/40.geojson', 'utf8'))
+router.get('/api/routes/:routeShortName', function *(next) {
+  this.body = JSON.parse(fs.readFileSync(`./data/${this.params.routeShortName}.geojson`, 'utf8'))
 })
 
-router.get('/api/routes/40/vehicles', function *(next) {
-  this.body = yield utils.createGeojsonForRoute('1_102574')
+router.get('/api/routes/:routeShortName/vehicles', function *(next) {
+  this.body = yield utils.createGeojsonForRoute(this.params.routeShortName)
 })
 
 app.use(serve(__dirname + '/static'))
