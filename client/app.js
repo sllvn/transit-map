@@ -1,47 +1,52 @@
-/* globals L, fetch */
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import 'mapbox.js'
-import 'mapbox.js/dist/mapbox.css'
-import './leaflet.rotatedMarker'
-import './app.css'
+import Mapbox from './mapbox'
+import Filter from './filter'
+import { getJson } from './utils'
 
-L.mapbox.accessToken = 'pk.eyJ1IjoibGljeWV1cyIsImEiOiJuZ1gtOWtjIn0.qaaGvywaJ_kCmwmlTSNyVw'
+class App extends React.Component {
+  constructor () {
+    super()
+    this.state = { routes: [] }
+  }
 
-const mapCenter = [47.652126, -122.350906]
-const map = L.mapbox.map('map', 'mapbox.light').setView(mapCenter, 13)
+  componentDidMount () {
+    const routeNumber = 40
 
-const icon = L.icon({
-  iconUrl: require('./right-arrow.png'),
-  iconSize: [20, 20]
-})
-
-const routeNumbers = [40]
-
-routeNumbers.forEach(routeNumber => {
-  getJson(`/api/${routeNumber}/route.json`).then(geojson => {
-    const geojsonStyle = {
-      color: '#ae63ca'
-    }
-    L.geoJson(geojson, { style: geojsonStyle }).addTo(map)
-  })
-
-  getJson(`/api/${routeNumber}/vehicles.json`).then(geojson => {
-    geojson.features.forEach(vehicle => {
-      const marker = L.marker([vehicle.geometry.coordinates[1], vehicle.geometry.coordinates[0]], {
-        icon: icon,
-        rotationAngle: transformOrientation(vehicle.properties.orientation),
-        rotationOrigin: 'center center'
-      }).addTo(map)
-      marker.bindPopup('<div class="vehicle-popup"><h5>' + vehicle.properties.routeShortName + ' <small>(' + vehicle.properties.vehicleId + ')</small></h5></div>')
+    Promise.all([
+      getJson(`/api/${routeNumber}/route.json`),
+      getJson(`/api/${routeNumber}/vehicles.json`)
+    ]).then(data => {
+      this.setState({
+        routes: [
+          {
+            shortName: '40',
+            color: '#ae63ca',
+            routeGeojson: data[0],
+            vehicleGeojson: data[1]
+          }
+        ]
+      })
     })
-  })
-})
+  }
 
-function transformOrientation (orientation) {
-  return 360 - orientation
+  render () {
+    const { routes } = this.state
+
+    return (
+      <div>
+        <h1>Seattle Transit Map</h1>
+        <Filter />
+        <Mapbox
+          mapboxAccessToken='pk.eyJ1IjoibGljeWV1cyIsImEiOiJuZ1gtOWtjIn0.qaaGvywaJ_kCmwmlTSNyVw'
+          mapCenter={[47.652126, -122.350906]}
+          routes={routes}
+        />
+      </div>
+    )
+  }
 }
 
-function getJson (endpoint) {
-  return fetch(endpoint).then(res => res.json()).catch(err => console.error('err', err))
-}
+ReactDOM.render(<App />, document.getElementById('app'))
 
