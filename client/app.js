@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Mapbox from './mapbox'
-import Filter from './filter'
+import Mapbox from './components/mapbox'
+import Filter from './components/filter'
 import { getJson } from './utils'
 
 class App extends React.Component {

@@ -3,8 +3,8 @@ import React from 'react'
 
 import 'mapbox.js'
 import 'mapbox.js/dist/mapbox.css'
-import '../lib/leaflet.rotatedMarker'
-import './app.css'
+import '../../lib/leaflet.rotatedMarker'
+import './mapbox.css'
 
 class Mapbox extends React.Component {
   componentDidMount () {
@@ -41,7 +41,7 @@ class Mapbox extends React.Component {
   }
 
   render () {
-    return <div ref='map'></div>
+    return <div ref='map' id='map'></div>
   }
 }
 
