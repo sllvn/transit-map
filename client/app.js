@@ -1,27 +1,31 @@
-/* globals $, L */
+/* globals L, fetch */
+
+import 'mapbox.js'
+import 'mapbox.js/dist/mapbox.css'
+import './leaflet.rotatedMarker'
+import './app.css'
 
 L.mapbox.accessToken = 'pk.eyJ1IjoibGljeWV1cyIsImEiOiJuZ1gtOWtjIn0.qaaGvywaJ_kCmwmlTSNyVw'
 
 const mapCenter = [47.652126, -122.350906]
 const map = L.mapbox.map('map', 'mapbox.light').setView(mapCenter, 13)
 
-
 const icon = L.icon({
-  iconUrl: 'right-arrow.png',
+  iconUrl: require('./right-arrow.png'),
   iconSize: [20, 20]
 })
 
-const routeNumbers = [28, 40]
+const routeNumbers = [40]
 
 routeNumbers.forEach(routeNumber => {
-  $.getJSON(`/api/routes/${routeNumber}`, geojson => {
+  getJson(`/api/${routeNumber}/route.json`).then(geojson => {
     const geojsonStyle = {
       color: '#ae63ca'
     }
     L.geoJson(geojson, { style: geojsonStyle }).addTo(map)
   })
 
-  $.getJSON(`/api/routes/${routeNumber}/vehicles`, geojson => {
+  getJson(`/api/${routeNumber}/vehicles.json`).then(geojson => {
     geojson.features.forEach(vehicle => {
       const marker = L.marker([vehicle.geometry.coordinates[1], vehicle.geometry.coordinates[0]], {
         icon: icon,
@@ -35,5 +39,9 @@ routeNumbers.forEach(routeNumber => {
 
 function transformOrientation (orientation) {
   return 360 - orientation
+}
+
+function getJson (endpoint) {
+  return fetch(endpoint).then(res => res.json()).catch(err => console.error('err', err))
 }
 

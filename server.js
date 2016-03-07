@@ -19,10 +19,10 @@ router.get('/api/routes/:routeShortName/vehicles', function *(next) {
   this.body = yield utils.createGeojsonForRoute(this.params.routeShortName)
 })
 
-app.use(serve(__dirname + '/static'))
+app.use(serve(__dirname + '/client'))
 
 app.use(router.routes())
 
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 3000
 app.listen(port)
 console.log(chalk.green(`listening on port ${port}`))
