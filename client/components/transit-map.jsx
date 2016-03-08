@@ -4,7 +4,7 @@ import Mapbox from './mapbox'
 
 export default class TransitMap extends React.Component {
   render () {
-    const { routes } = this.props
+    const routes = this.props.routes.filter(r => r.isEnabled && r.routeGeojson && r.vehicleGeojson)
 
     const paths = routes.reduce((acc, route) => {
       acc = acc.concat({
@@ -54,5 +54,5 @@ export default class TransitMap extends React.Component {
 }
 
 TransitMap.propTypes = {
-  activeRoutes: React.PropTypes.array
+  routes: React.PropTypes.array
 }

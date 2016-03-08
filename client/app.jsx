@@ -9,13 +9,11 @@ import { getJson } from './utils'
 class App extends React.Component {
   constructor () {
     super()
-    // TODO: combine active routes and available routes, active routes = available routes with isEnabled: true
     this.state = {
-      activeRoutes: [],
-      availableRoutes: [ // TODO: pull from API
-        { shortName: '26', isEnabled: true },
-        { shortName: '28', isEnabled: false },
-        { shortName: '40', isEnabled: false }
+      routes: [ // TODO: pull from API
+        { shortName: '26' },
+        { shortName: '28' },
+        { shortName: '40' }
       ]
     }
   }
@@ -23,46 +21,52 @@ class App extends React.Component {
   componentDidMount () {
     // TODO: create fake data for 28 and 40, hook up fake API endpoints
     const routeNumber = 26
+    const { routes } = this.state
 
     getJson(`/api/${routeNumber}.json`)
       .then(data => {
-        this.setState({
-          activeRoutes: [
-            {
-              shortName: data.shortName,
+        const changeIndex = findIndex(routes, { shortName: data.shortName })
+        const newRoutes = [
+          ...routes.slice(0, changeIndex),
+          {
+            ...this.state.routes[changeIndex],
+            ...{
+              isEnabled: true,
               routeGeojson: data.routeShape,
               vehicleGeojson: data.vehiclesShape,
               connectingRouteShortName: data.connectingRoutes[0].shortName,
               connectingRouteGeojson: data.connectingRoutes[0].routeShape
             }
-          ]
-        })
+          },
+          ...routes.slice(changeIndex + 1)
+        ]
+        this.setState({ routes: newRoutes })
       })
   }
 
   handleFilterChange (routeShortName) {
-    const { availableRoutes } = this.state
-    const changeIndex = findIndex(availableRoutes, { shortName: routeShortName })
+    const { routes } = this.state
+    const changeIndex = findIndex(routes, { shortName: routeShortName })
     const newRoutes = [
-      ...availableRoutes.slice(0, changeIndex),
-      { ...availableRoutes[changeIndex], isEnabled: !availableRoutes[changeIndex].isEnabled },
-      ...availableRoutes.slice(changeIndex + 1)
+      ...routes.slice(0, changeIndex),
+      { ...routes[changeIndex], isEnabled: !routes[changeIndex].isEnabled },
+      ...routes.slice(changeIndex + 1)
     ]
-    this.setState({ availableRoutes: newRoutes })
+    this.setState({ routes: newRoutes })
   }
 
   render () {
-    const { activeRoutes, availableRoutes } = this.state
+    const { routes } = this.state
 
     return (
       <div>
         <h1>Seattle Transit Map</h1>
         <Filter
-          availableRoutes={availableRoutes}
+          routes={routes}
           onChange={this.handleFilterChange.bind(this)}
         />
         <TransitMap
-          routes={activeRoutes}
+          routes={routes}
         />
       </div>
     )

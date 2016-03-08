@@ -2,11 +2,11 @@ import React from 'react'
 
 class Filter extends React.Component {
   render () {
-    const { availableRoutes, onChange } = this.props
+    const { routes, onChange } = this.props
 
     return (
       <div>
-        {availableRoutes.map((route, key) =>
+        {routes.map((route, key) =>
           <div key={key}>
             <label>
               <input
@@ -25,7 +25,7 @@ class Filter extends React.Component {
 
 Filter.propTypes = {
   onChange: React.PropTypes.func,
-  availableRoutes: React.PropTypes.array.isRequired
+  routes: React.PropTypes.array.isRequired
 }
 
 export default Filter
