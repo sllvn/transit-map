@@ -9,22 +9,20 @@ import { getJson } from './utils'
 class App extends React.Component {
   constructor () {
     super()
-    this.state = {
-      routes: [ // TODO: pull from API
-        { shortName: '26' },
-        { shortName: '28' },
-        { shortName: '40' }
-      ]
-    }
+    this.state = { routes: [] }
   }
 
   componentDidMount () {
-    // TODO: create fake data for 28 and 40, hook up fake API endpoints
-    const routeNumber = 26
-    const { routes } = this.state
+    getJson(`/api/routes.json`)
+      .then(data => {
+        this.setState({ routes: data.routes })
+      })
+  }
 
+  loadRoute (routeNumber) {
     getJson(`/api/${routeNumber}.json`)
       .then(data => {
+        const { routes } = this.state
         const changeIndex = findIndex(routes, { shortName: data.shortName })
         const newRoutes = [
           ...routes.slice(0, changeIndex),
@@ -47,12 +45,17 @@ class App extends React.Component {
   handleFilterChange (routeShortName) {
     const { routes } = this.state
     const changeIndex = findIndex(routes, { shortName: routeShortName })
-    const newRoutes = [
-      ...routes.slice(0, changeIndex),
-      { ...routes[changeIndex], isEnabled: !routes[changeIndex].isEnabled },
-      ...routes.slice(changeIndex + 1)
-    ]
-    this.setState({ routes: newRoutes })
+    const foundRoute = routes[changeIndex]
+    if (!foundRoute.isEnabled) {
+      this.loadRoute(foundRoute.shortName)
+    } else {
+      const newRoutes = [
+        ...routes.slice(0, changeIndex),
+        { ...foundRoute, isEnabled: false },
+        ...routes.slice(changeIndex + 1)
+      ]
+      this.setState({ routes: newRoutes })
+    }
   }
 
   render () {
