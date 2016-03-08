@@ -4,7 +4,7 @@ import Mapbox from './mapbox'
 
 export default class TransitMap extends React.Component {
   render () {
-    const routes = this.props.routes.filter(r => r.isEnabled && r.routeGeojson && r.vehicleGeojson)
+    const routes = this.props.routes.filter(r => r.isEnabled && r.routeGeojson && r.vehicles)
 
     const paths = routes.reduce((acc, route) => {
       acc = acc.concat({
@@ -30,13 +30,13 @@ export default class TransitMap extends React.Component {
     })
 
     const markers = routes.reduce((acc, route) => {
-      const vehicles = route.vehicleGeojson.features.map(vehicle => {
+      const vehicles = route.vehicles.map(vehicle => {
         return {
-          lat: vehicle.geometry.coordinates[1],
-          lng: vehicle.geometry.coordinates[0],
-          orientation: vehicle.properties.orientation,
-          icon: vehicleIcon,
-          popup: `<h5>${route.shortName} <small>(${vehicle.properties.vehicleId})</small></h5>`
+          ...vehicle,
+          ...{
+            icon: vehicleIcon,
+            popup: `<h5>${route.shortName} <small>(${vehicle.vehicleId})</small></h5>`
+          }
         }
       })
       return acc.concat(vehicles)

@@ -5,20 +5,19 @@ class Filter extends React.Component {
     const { routes, onChange } = this.props
 
     return (
-      <div>
+      <ul>
         {routes.map((route, key) =>
-          <div key={key}>
+          <li key={key}>
             <label>
               <input
                 type='checkbox'
                 checked={route.isEnabled}
                 onChange={e => onChange(route.shortName)}
-              />
-              {route.shortName}
+              /> {route.shortName}
             </label>
-          </div>
+          </li>
         )}
-      </div>
+      </ul>
     )
   }
 }

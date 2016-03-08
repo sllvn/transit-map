@@ -4,7 +4,11 @@ import findIndex from 'lodash/findIndex'
 
 import TransitMap from './components/transit-map'
 import Filter from './components/filter'
+import RouteInfo from './components/route-info'
 import { getJson } from './utils'
+
+import 'bootstrap/dist/css/bootstrap.css'
+require('./app.css')
 
 class App extends React.Component {
   constructor () {
@@ -31,7 +35,8 @@ class App extends React.Component {
             ...{
               isEnabled: true,
               routeGeojson: data.routeShape,
-              vehicleGeojson: data.vehiclesShape,
+              vehicles: data.vehicles,
+              alerts: data.alerts,
               connectingRouteShortName: data.connectingRoutes[0].shortName,
               connectingRouteGeojson: data.connectingRoutes[0].routeShape
             }
@@ -60,17 +65,28 @@ class App extends React.Component {
 
   render () {
     const { routes } = this.state
+    const activeRoutes = routes.filter(r => r.isEnabled)
 
     return (
-      <div>
-        <h1>Seattle Transit Map</h1>
-        <Filter
-          routes={routes}
-          onChange={this.handleFilterChange.bind(this)}
-        />
-        <TransitMap
-          routes={routes}
-        />
+      <div className='container-fluid full-height'>
+        <div className='row full-height'>
+
+          <div className='sidebar col-md-3'>
+            <h1>Seattle Transit Map</h1>
+            <Filter
+              routes={routes}
+              onChange={this.handleFilterChange.bind(this)}
+            />
+            <RouteInfo routes={activeRoutes} />
+          </div>
+
+          <div className='col-md-9 map-container'>
+            <TransitMap
+              routes={activeRoutes}
+            />
+          </div>
+
+        </div>
       </div>
     )
   }

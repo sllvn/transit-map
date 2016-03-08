@@ -1,0 +1,15 @@
+html, body, #app, .full-height {
+  height: 100%;
+}
+
+.sidebar {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.map-container {
+  height: 100%;
+  padding: 0;
+}
+
