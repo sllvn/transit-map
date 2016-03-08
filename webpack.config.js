@@ -4,13 +4,17 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   context: __dirname + '/client',
   entry: {
-    javascript: './app.js'
+    javascript: './app.jsx'
   },
 
   output: {
     filename: 'app.js',
     path: __dirname + '/dist',
     publicPath: '/dist/'
+  },
+
+  resolve: {
+    extensions: ['', '.js', '.jsx']
   },
 
   module: {

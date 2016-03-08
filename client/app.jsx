@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import findIndex from 'lodash/findIndex'
 
-import Mapbox from './components/mapbox'
+import TransitMap from './components/transit-map'
 import Filter from './components/filter'
 import { getJson } from './utils'
 
@@ -61,9 +61,7 @@ class App extends React.Component {
           availableRoutes={availableRoutes}
           onChange={this.handleFilterChange.bind(this)}
         />
-        <Mapbox
-          mapboxAccessToken='pk.eyJ1IjoibGljeWV1cyIsImEiOiJuZ1gtOWtjIn0.qaaGvywaJ_kCmwmlTSNyVw'
-          mapCenter={[47.652126, -122.350906]}
+        <TransitMap
           routes={activeRoutes}
         />
       </div>
