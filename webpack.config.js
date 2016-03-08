@@ -18,7 +18,19 @@ module.exports = {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loader: 'babel'
+        loader: 'babel',
+        query: {
+          presets: ['es2015', 'react', 'stage-0'],
+          plugins: [[
+            'react-transform', {
+              transforms: [{
+                transform: 'react-transform-hmr',
+                imports: ['react'],
+                locals: ['module']
+              }]
+            }
+          ]]
+        }
       },
       { test: /\.json$/, loader: 'json' },
       { test: /\.(html|png)$/, loader: 'file?name=[name].[ext]j' },
@@ -33,7 +45,6 @@ module.exports = {
       title: 'Transit Map',
       inject: 'body'
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.ProvidePlugin({
       fetch: 'imports?this=>global!exports?global.fetch!whatwg-fetch'
     })
