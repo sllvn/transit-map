@@ -21,8 +21,13 @@ class Mapbox extends React.Component {
   }
 
   renderRoute (route) {
-    const geojsonStyle = { color: route.color }
-    L.geoJson(route.routeGeojson, { style: geojsonStyle }).addTo(this.map)
+    const currentRouteStyle = { color: '#ae63ca' }
+    const currentRoute = L.geoJson(route.routeGeojson, { style: currentRouteStyle }).addTo(this.map)
+    currentRoute.bindPopup(`<div class="map-popup"><h5>Route: ${route.shortName}</h5></div>`)
+
+    const connectingRouteStyle = { color: '#756dfe' }
+    const connectingRoute = L.geoJson(route.connectingRouteGeojson, { style: connectingRouteStyle }).addTo(this.map)
+    connectingRoute.bindPopup(`<div class="map-popup"><h5>Connecting Route: ${route.connectingRouteShortName}</h5></div>`)
 
     route.vehicleGeojson.features.forEach(vehicle => {
       const marker = L.marker([vehicle.geometry.coordinates[1], vehicle.geometry.coordinates[0]], {
@@ -30,7 +35,7 @@ class Mapbox extends React.Component {
         rotationAngle: this.transformOrientation(vehicle.properties.orientation),
         rotationOrigin: 'center center'
       }).addTo(this.map)
-      marker.bindPopup('<div class="vehicle-popup"><h5>' + route.shortName + ' <small>(' + vehicle.properties.vehicleId + ')</small></h5></div>')
+      marker.bindPopup('<div class="map-popup"><h5>' + route.shortName + ' <small>(' + vehicle.properties.vehicleId + ')</small></h5></div>')
     })
   }
 
