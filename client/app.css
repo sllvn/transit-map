@@ -13,3 +13,7 @@ html, body, #app, .full-height {
   padding: 0;
 }
 
+.map-popup {
+  min-width: 200px;
+}
+

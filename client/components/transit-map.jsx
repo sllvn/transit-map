@@ -1,6 +1,7 @@
 import React from 'react'
 
 import Mapbox from './mapbox'
+import VehiclePopup from './vehicle-popup'
 
 export default class TransitMap extends React.Component {
   render () {
@@ -35,7 +36,7 @@ export default class TransitMap extends React.Component {
           ...vehicle,
           ...{
             icon: vehicleIcon,
-            popup: `<h5>${route.shortName} <small>(${vehicle.vehicleId})</small></h5>`
+            popup: <VehiclePopup route={route} vehicle={vehicle} />
           }
         }
       })

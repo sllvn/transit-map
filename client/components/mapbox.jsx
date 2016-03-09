@@ -1,5 +1,6 @@
 /* globals L */
 import React from 'react'
+import ReactDOM from 'react-dom'
 
 import 'mapbox.js'
 import 'mapbox.js/dist/mapbox.css'
@@ -43,7 +44,12 @@ class Mapbox extends React.Component {
         rotationAngle: this.transformOrientation(marker.orientation),
         rotationOrigin: 'center center'
       }).addTo(this.map)
-      newMarker.bindPopup(`<div class="map-popup">${marker.popup}</div>`)
+      if (typeof marker.popup === 'object') {
+        newMarker.bindPopup(`<div id="test" class="map-popup"></div>`)
+        newMarker.on('popupopen', e => ReactDOM.render(marker.popup, e.popup._contentNode))
+      } else {
+        newMarker.bindPopup(`<div id="test" class="map-popup">${marker.popup}</div>`)
+      }
       return acc.concat(newMarker)
     }, [])
     this.setState({ markers: [...this.state.markers, ...newMarkers] })
