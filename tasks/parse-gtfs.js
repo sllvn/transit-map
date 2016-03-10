@@ -2,6 +2,7 @@ const csv = require('csv')
 const fs = require('fs')
 const _ = require('lodash')
 const GeoJSON = require('geojson')
+const co = require('co')
 
 function parseGtfsFile (filename) {
   return new Promise((resolve, reject) => {
@@ -13,34 +14,20 @@ function parseGtfsFile (filename) {
   })
 }
 
-const loadRoute = shortName =>
-  parseGtfsFile('routes').then(data => _.find(data, { route_short_name: shortName }))
+const loadRoute = shortName => parseGtfsFile('routes').then(data => _.find(data, { route_short_name: shortName }))
+const loadTripsForRoute = routeId => parseGtfsFile('trips').then(data => _.filter(data, { route_id: routeId }))
+const loadTripsForBlock = blockId => parseGtfsFile('trips').then(data => _.filter(data, { block_id: blockId }))
+const loadShape = shapeId => parseGtfsFile('shapes').then(data => _.filter(data, { shape_id: shapeId }))
 
-const loadTripsForRoute = routeId =>
-  parseGtfsFile('trips').then(data => _.filter(data, { route_id: routeId }))
+co(function *() {
+  const route = yield loadRoute('26')
+  const trips = yield loadTripsForRoute(route.route_id)
+  const blockIds = _.chain(trips).map('block_id').uniq().value()
+  const blockTrips = yield loadTripsForBlock(blockIds[0])
+  const shapeIds = _.chain(blockTrips).filter({ direction_id: '1' }).map('shape_id').uniq().value()
+  const shape = yield loadShape(shapeIds[0])
+  const points = _.reduce(shape, (acc, v) => acc.concat([[v.shape_pt_lon, v.shape_pt_lat]]), [])
+  const geojson = GeoJSON.parse([{ line: points }], { LineString: 'line' })
+  console.log(JSON.stringify(geojson))
+})
 
-const loadTripsForBlock = blockId =>
-  parseGtfsFile('trips').then(data => _.filter(data, { block_id: blockId }))
-
-const loadShape = shapeId =>
-  parseGtfsFile('shapes').then(data => _.filter(data, { shape_id: shapeId }))
-
-/*
- * a route has many trips
- * a trip has a few blocks
- * for one ride, you want all blocks for that trip and direction
-*/
-
-// TODO: convert this promise mess to use generators + co
-loadRoute('26')
-  .then(route => loadTripsForRoute(route.route_id))
-  .then(trips => trips[0].block_id)
-  .then(loadTripsForBlock)
-  .then(trips => _.chain(trips).filter({ direction_id: '1' }).map('shape_id').uniq().value())
-  .then(shapeIds => shapeIds[0])
-  .then(loadShape)
-  .then(vertices => {
-    const points = _.reduce(vertices, (acc, v) => acc.concat([[v.shape_pt_lon, v.shape_pt_lat]]), [])
-    const geojson = GeoJSON.parse([{ line: points }], { LineString: 'line' })
-    console.log(JSON.stringify(geojson))
-  })

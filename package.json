@@ -12,6 +12,7 @@
   "dependencies": {
     "bootstrap": "^4.0.0-alpha.2",
     "chalk": "^1.1.1",
+    "co": "^4.6.0",
     "css-loader": "^0.23.1",
     "csv": "^0.4.6",
     "dotenv": "^2.0.0",
