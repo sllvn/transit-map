@@ -1,9 +1,7 @@
 const promisify = require('es6-promisify')
-const request = promisify(require('request'))
+const request = promisify(require('request')) // TODO: replace with isomorphic-fetch
 const _ = require('lodash')
 const async = require('async')
-const GeoJSON = require('geojson')
-const fs = require('fs')
 
 require('dotenv').load()
 const API_KEY = process.env.OBA_API_KEY
@@ -14,7 +12,8 @@ const routeIdMap = {
   '40': '1_102574'
 }
 
-function createGeojsonForRoute (routeShortName) {
+function getVehiclesForRoute (routeShortName) {
+  // TODO: const routeId = `${route.agency_id}_${route.route_id}`
   const routeId = routeIdMap[routeShortName]
 
   return new Promise((resolve, reject) => {
@@ -25,9 +24,8 @@ function createGeojsonForRoute (routeShortName) {
       async.reduce(tripIds, [], _.throttle(getTripDetails, 0), (err, result) => {
         if (err) { reject(err) }
 
-        const vehicles = _.map(result, r => Object.assign({}, r, { routeShortName }))
-        const geojson = GeoJSON.parse(vehicles, { Point: ['lat', 'lng'] })
-        resolve(geojson)
+        const vehicles = result.map(v => _.pick(v, ['lat', 'lng', 'orientation', 'vehicleId', 'scheduleDeviation']))
+        resolve(vehicles)
       })
     })
   })
@@ -51,17 +49,4 @@ function mungeStatus (status) {
   })
 }
 
-function mergeGeojson (geojson, route) {
-  geojson.features.push({
-    type: 'Feature',
-    geometry: route,
-    properties: {
-      shortName: '40'
-    }
-  })
-  return geojson
-}
-
-module.exports = {
-  createGeojsonForRoute: createGeojsonForRoute
-}
+module.exports = { getVehiclesForRoute }

@@ -23,12 +23,13 @@ class App extends React.Component {
       })
   }
 
-  loadRoute (routeNumber) {
-    getJson(`/api/routes/${routeNumber}`)
+  loadRoute (routeShortName) {
+    // TODO: gracefully merge the two requests, i.e., don't assume that route request completes before vehicles request - already handled with spread syntax?
+    getJson(`/api/routes/${routeShortName}`)
       .then(data => {
-        const { routes } = this.state
         const route = data.route
-        const changeIndex = findIndex(routes, { shortName: route.shortName })
+        const { routes } = this.state
+        const changeIndex = findIndex(routes, { shortName: routeShortName })
         const connectingRoute = route.connectingRoutes[0] || {}
         const newRoutes = [
           ...routes.slice(0, changeIndex),
@@ -37,11 +38,27 @@ class App extends React.Component {
             ...{
               isEnabled: true,
               routeGeojson: route.routeShape,
-              vehicles: route.vehicles,
               alerts: route.alerts,
+              vehicles: [],
               connectingRouteShortName: connectingRoute.shortName,
               connectingRouteGeojson: connectingRoute.routeShape
             }
+          },
+          ...routes.slice(changeIndex + 1)
+        ]
+        this.setState({ routes: newRoutes })
+      })
+
+    getJson(`/api/routes/${routeShortName}/vehicles`)
+      .then(data => {
+        const vehicles = data.vehicles
+        const { routes } = this.state
+        const changeIndex = findIndex(routes, { shortName: routeShortName })
+        const newRoutes = [
+          ...routes.slice(0, changeIndex),
+          {
+            ...this.state.routes[changeIndex],
+            ...{ vehicles: vehicles }
           },
           ...routes.slice(changeIndex + 1)
         ]

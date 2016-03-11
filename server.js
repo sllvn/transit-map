@@ -24,7 +24,7 @@ router.get('/api/routes/:routeShortName', function *(next) {
 })
 
 router.get('/api/routes/:routeShortName/vehicles', function *(next) {
-  const vehicles = yield utils.createGeojsonForRoute(this.params.routeShortName)
+  const vehicles = yield utils.getVehiclesForRoute(this.params.routeShortName)
   this.body = { vehicles: serializers.serializeVehicles(vehicles) }
 })
 
