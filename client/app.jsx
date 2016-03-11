@@ -27,17 +27,18 @@ class App extends React.Component {
     getJson(`/api/routes/${routeNumber}`)
       .then(data => {
         const { routes } = this.state
-        const changeIndex = findIndex(routes, { shortName: data.shortName })
-        const connectingRoute = data.connectingRoutes[0] || {}
+        const route = data.route
+        const changeIndex = findIndex(routes, { shortName: route.shortName })
+        const connectingRoute = route.connectingRoutes[0] || {}
         const newRoutes = [
           ...routes.slice(0, changeIndex),
           {
             ...this.state.routes[changeIndex],
             ...{
               isEnabled: true,
-              routeGeojson: data.routeShape,
-              vehicles: data.vehicles,
-              alerts: data.alerts,
+              routeGeojson: route.routeShape,
+              vehicles: route.vehicles,
+              alerts: route.alerts,
               connectingRouteShortName: connectingRoute.shortName,
               connectingRouteGeojson: connectingRoute.routeShape
             }
