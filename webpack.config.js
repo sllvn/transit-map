@@ -52,5 +52,14 @@ module.exports = {
     new webpack.ProvidePlugin({
       fetch: 'imports?this=>global!exports?global.fetch!whatwg-fetch'
     })
-  ]
+  ],
+
+  devServer: {
+    proxy: {
+      '/api/*': {
+        target: 'http://localhost:3000',
+        secure: false
+      }
+    }
+  }
 }

@@ -17,17 +17,18 @@ class App extends React.Component {
   }
 
   componentDidMount () {
-    getJson(`/api/routes.json`)
+    getJson(`/api/routes`)
       .then(data => {
         this.setState({ routes: data.routes })
       })
   }
 
   loadRoute (routeNumber) {
-    getJson(`/api/${routeNumber}.json`)
+    getJson(`/api/routes/${routeNumber}`)
       .then(data => {
         const { routes } = this.state
         const changeIndex = findIndex(routes, { shortName: data.shortName })
+        const connectingRoute = data.connectingRoutes[0] || {}
         const newRoutes = [
           ...routes.slice(0, changeIndex),
           {
@@ -37,8 +38,8 @@ class App extends React.Component {
               routeGeojson: data.routeShape,
               vehicles: data.vehicles,
               alerts: data.alerts,
-              connectingRouteShortName: data.connectingRoutes[0].shortName,
-              connectingRouteGeojson: data.connectingRoutes[0].routeShape
+              connectingRouteShortName: connectingRoute.shortName,
+              connectingRouteGeojson: connectingRoute.routeShape
             }
           },
           ...routes.slice(changeIndex + 1)
