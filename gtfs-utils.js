@@ -13,6 +13,23 @@ function parseGtfsFile (filename) {
   })
 }
 
+const getRoute = function *(routeShortName) {
+  const routes = yield parseGtfsFile('routes')
+  const route = _.find(routes, { route_short_name: routeShortName })
+  if (!route) { return }
+
+  console.log(route.route_long_name)
+  return {
+    gtfs: {
+      agency_id: route.agency_id,
+      route_id: route.route_id
+    },
+    shortName: route.route_short_name,
+    longName: route.route_desc,
+    url: route.route_url
+  }
+}
+
 const extractShapes = function *(opts) {
   const shapes = yield parseGtfsFile('shapes')
   const shapeIds = opts.shapeIds || _.chain(shapes).map('shape_id').uniq().value()
@@ -31,7 +48,7 @@ const shapeIdsForRoute = function *(routeId) {
   return shapeIdsForRoute
 }
 
-module.exports = { parseGtfsFile, extractShapes, shapeIdsForRoute }
+module.exports = { getRoute, parseGtfsFile, extractShapes, shapeIdsForRoute }
 
 // const loadRoute = shortName => parseGtfsFile('routes').then(data => _.find(data, { route_short_name: shortName }))
 // const loadTripsForRoute = routeId => parseGtfsFile('trips').then(data => _.filter(data, { route_id: routeId }))

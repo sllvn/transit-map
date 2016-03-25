@@ -3,11 +3,13 @@ const type = thinky.type
 
 const Shape = thinky.createModel('Shape', {
   id: type.string(),
+  gtfs: type.object(),
   geojson: type.object()
 })
 
 const Alert = thinky.createModel('Alert', {
   id: type.string(),
+  gtfs: type.object(),
   datePublished: type.date(),
   url: type.string(),
   content: type.string()
@@ -15,6 +17,7 @@ const Alert = thinky.createModel('Alert', {
 
 const Route = thinky.createModel('Route', {
   id: type.string(),
+  gtfs: type.object(),
   shortName: type.string(),
   longName: type.string(),
   url: type.string(),
